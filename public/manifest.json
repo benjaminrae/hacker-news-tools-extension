@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Hacker News Tools",
+  "version": "1.0",
+  "description": "Read Hacker News comments with ease.",
+  "permissions": ["scripting", "tabs", "activeTab", "storage"],
+  "content_scripts": [
+    {
+      "service_worker": "index.js",
+      "matches": ["*://news.ycombinator.com/item*"],
+      "js": ["index.js"],
+      "runs_at": "document_end"
+    }
+  ]
+}
