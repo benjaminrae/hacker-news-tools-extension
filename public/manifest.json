@@ -6,10 +6,13 @@
   "permissions": ["scripting", "tabs", "activeTab", "storage"],
   "content_scripts": [
     {
-      "service_worker": "index.js",
       "matches": ["*://news.ycombinator.com/item*"],
       "js": ["index.js"],
       "runs_at": "document_end"
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
 }

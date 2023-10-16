@@ -10,6 +10,7 @@ const css = `
   padding: 10px;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .hn-scroller__previous,
