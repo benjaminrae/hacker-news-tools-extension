@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs --minify terser --clean --legacy-output dist/index.js --publicDir"
+    "build": "tsup",
+    "build:dev": "tsup --watch"
   },
   "keywords": [],
   "author": "",
