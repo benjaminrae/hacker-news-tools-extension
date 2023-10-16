@@ -5,8 +5,6 @@ import { loadStyles } from './widget/styles';
 
 const topLevelComments = document.querySelectorAll("td.ind[indent='0']");
 
-console.log(topLevelComments);
-
 const commentYPositionFloorMap = new Map<number, Element>();
 const commentYPositionCeilMap = new Map<number, Element>();
 
@@ -27,6 +25,55 @@ document.addEventListener('scroll', () => {
 
 const { container, nextButton, previousButton } = loadScrollButtonsWidget();
 loadStyles();
+
+container.draggable = true;
+
+let clickX: number;
+let clickY: number;
+
+container.addEventListener('mousedown', event => {
+  if (!event.target) {
+    return;
+  }
+
+  clickX = event.clientX - container.getBoundingClientRect().x;
+  clickY = event.clientY - container.getBoundingClientRect().y;
+});
+
+container.addEventListener('dragstart', event => {
+  console.log('drag start');
+  if (!event.dataTransfer) {
+    return;
+  }
+  event.dataTransfer.setData('text/plain', 'This text may be dragged');
+  event.dataTransfer.effectAllowed = 'move';
+
+  console.log(event);
+});
+
+container.addEventListener('dragend', event => {
+  console.log('drag end');
+
+  if (!event.dataTransfer) {
+    return;
+  }
+
+  event.dataTransfer.dropEffect = 'move';
+
+  if (!event.target) {
+    return;
+  }
+
+  container.style.position = 'absolute';
+
+  console.log(event);
+
+  container.style.top = `${event.pageY - clickY}px`;
+  container.style.left = `${event.pageX - clickX}px`;
+  container.style.objectPosition = 'center';
+  container.style.bottom = 'unset';
+  container.style.right = 'unset';
+});
 
 previousButton.addEventListener('click', () => {
   const commentToScrollTo = previousCommentIndexStrategy(
