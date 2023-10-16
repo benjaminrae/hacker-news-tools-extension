@@ -1,3 +1,5 @@
+import { getOptions } from './storage/getOptions';
+import { saveOptions } from './storage/saveOptions';
 import { nextCommentIndexStrategy } from './strategies/nextCommentStrategy';
 import { previousCommentIndexStrategy } from './strategies/previousCommentStrategy';
 import { loadScrollButtonsWidget } from './widget/scrollButtonsWidget';
@@ -30,6 +32,13 @@ container.draggable = true;
 
 let clickX: number;
 let clickY: number;
+
+const options = getOptions();
+
+console.log(options);
+
+container.style.top = `${options.widgetPositionY}px`;
+container.style.left = `${options.widgetPositionX}px`;
 
 container.addEventListener('mousedown', event => {
   if (!event.target) {
@@ -64,15 +73,19 @@ container.addEventListener('dragend', event => {
     return;
   }
 
-  container.style.position = 'absolute';
+  const positionX = event.pageX - clickX;
+  const positionY = event.pageY - clickY;
 
-  console.log(event);
-
-  container.style.top = `${event.pageY - clickY}px`;
-  container.style.left = `${event.pageX - clickX}px`;
+  container.style.top = `${positionY}px`;
+  container.style.left = `${positionX}px`;
   container.style.objectPosition = 'center';
   container.style.bottom = 'unset';
   container.style.right = 'unset';
+
+  saveOptions({
+    widgetPositionX: positionX,
+    widgetPositionY: positionY,
+  });
 });
 
 previousButton.addEventListener('click', () => {
@@ -101,7 +114,7 @@ nextButton.addEventListener('click', () => {
   scrollToElement(commentToScrollTo);
 });
 
-function scrollToElement(element: Element) {
+const scrollToElement = (element: Element) => {
   element.scrollIntoView({
     behavior: 'smooth',
   });
@@ -109,4 +122,13 @@ function scrollToElement(element: Element) {
   const elementYPosition = element.getBoundingClientRect().y;
 
   currentYPosition = elementYPosition;
-}
+};
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
+    console.log(
+      `Storage key "${key}" in namespace "${namespace}" changed.`,
+      `Old value was "${oldValue}", new value is "${newValue}".`,
+    );
+  }
+});
