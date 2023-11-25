@@ -1,20 +1,25 @@
+import { getWindowDimensions } from '../dimensions';
 import { ExtensionOptions } from '../types';
 
 export const getOptions = () => {
-  const options: ExtensionOptions = {
-    widgetPositionY: 0,
-    widgetPositionX: 0,
-  };
+  return new Promise<ExtensionOptions>(resolve => {
+    const { height, width } = getWindowDimensions();
 
-  chrome.storage.sync.get(
-    ['widgetPositionY', 'widgetPositionX'],
-    savedOptions => {
-      console.log(savedOptions);
+    const options: ExtensionOptions = {
+      widgetPositionY: height - 10,
+      widgetPositionX: width - 10,
+    };
 
-      options.widgetPositionX = savedOptions.widgetPositionX;
-      options.widgetPositionY = savedOptions.widgetPositionY;
-    },
-  );
+    chrome.storage.sync.get(
+      ['widgetPositionY', 'widgetPositionX'],
+      savedOptions => {
+        console.log(savedOptions);
 
-  return options;
+        options.widgetPositionX = savedOptions.widgetPositionX;
+        options.widgetPositionY = savedOptions.widgetPositionY;
+
+        resolve(options);
+      },
+    );
+  });
 };

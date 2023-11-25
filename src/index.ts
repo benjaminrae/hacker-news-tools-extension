@@ -1,3 +1,4 @@
+import { getWindowDimensions } from './dimensions';
 import { getOptions } from './storage/getOptions';
 import { saveOptions } from './storage/saveOptions';
 import { nextCommentIndexStrategy } from './strategies/nextCommentStrategy';
@@ -32,13 +33,16 @@ container.draggable = true;
 
 let clickX: number;
 let clickY: number;
+const { height, width } = getWindowDimensions();
 
-const options = getOptions();
+console.log(height, width);
 
-console.log(options);
+getOptions().then(options => {
+  console.log(options);
 
-container.style.top = `${options.widgetPositionY}px`;
-container.style.left = `${options.widgetPositionX}px`;
+  container.style.top = `${options.widgetPositionY ?? height - 10}px`;
+  container.style.left = `${options.widgetPositionX ?? width - 10}px`;
+});
 
 container.addEventListener('mousedown', event => {
   if (!event.target) {
@@ -47,6 +51,8 @@ container.addEventListener('mousedown', event => {
 
   clickX = event.clientX - container.getBoundingClientRect().x;
   clickY = event.clientY - container.getBoundingClientRect().y;
+
+  container.style.cursor = 'grabbing';
 });
 
 container.addEventListener('dragstart', event => {
@@ -55,9 +61,12 @@ container.addEventListener('dragstart', event => {
     return;
   }
   event.dataTransfer.setData('text/plain', 'This text may be dragged');
+  event.dataTransfer.dropEffect = 'move';
   event.dataTransfer.effectAllowed = 'move';
+});
 
-  console.log(event);
+document.addEventListener('dragover', event => {
+  event.preventDefault();
 });
 
 container.addEventListener('dragend', event => {
@@ -66,8 +75,6 @@ container.addEventListener('dragend', event => {
   if (!event.dataTransfer) {
     return;
   }
-
-  event.dataTransfer.dropEffect = 'move';
 
   if (!event.target) {
     return;
@@ -78,9 +85,7 @@ container.addEventListener('dragend', event => {
 
   container.style.top = `${positionY}px`;
   container.style.left = `${positionX}px`;
-  container.style.objectPosition = 'center';
-  container.style.bottom = 'unset';
-  container.style.right = 'unset';
+  container.style.cursor = 'grab';
 
   saveOptions({
     widgetPositionX: positionX,
@@ -123,12 +128,3 @@ const scrollToElement = (element: Element) => {
 
   currentYPosition = elementYPosition;
 };
-
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
-    console.log(
-      `Storage key "${key}" in namespace "${namespace}" changed.`,
-      `Old value was "${oldValue}", new value is "${newValue}".`,
-    );
-  }
-});
