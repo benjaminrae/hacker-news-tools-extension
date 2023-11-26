@@ -21,6 +21,23 @@ const css = `
   padding: 0;
 }
 
+.popup {
+  height: 400px;
+  width: 400px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  all: unset;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border: 1px solid black;
+}
+
 `;
 
 export const loadStyles = () => {

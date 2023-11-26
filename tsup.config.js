@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entryPoints: ['src/index.ts', 'src/widget/options.ts'],
+  entryPoints: ['src/index.ts', 'src/options.ts', 'src/popup.ts'],
   dts: true,
   sourcemap: true,
   format: ['cjs'],
