@@ -23,6 +23,8 @@ export const loadScrollButtonsWidget = () => {
 
   document.body.appendChild(scrollButtonsContainer);
 
+  scrollButtonsContainer.draggable = true;
+
   return {
     container: scrollButtonsContainer,
     previousButton: scrollToPreviousCommentButton,
