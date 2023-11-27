@@ -16,3 +16,16 @@ export interface Comment {
   scrollTo(): void;
   getDomElement(): HTMLElement;
 }
+
+export interface DoublyLinkedListNode<ListItem> {
+  next(): DoublyLinkedListNode<ListItem> | null;
+  prev(): DoublyLinkedListNode<ListItem> | null;
+  value(): ListItem;
+  addNext(node: DoublyLinkedListNode<ListItem>): DoublyLinkedListNode<ListItem>;
+}
+
+export interface DoublyLinkedList<ListItem> {
+  length(): number;
+  get(index: number): DoublyLinkedListNode<ListItem>;
+  append(item: ListItem): DoublyLinkedList<ListItem>;
+}
