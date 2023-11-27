@@ -7,8 +7,7 @@
   "content_scripts": [
     {
       "matches": ["*://news.ycombinator.com/item*"],
-      "js": ["index.js"],
-      "runs_at": "document_end"
+      "js": ["index.js"]
     }
   ],
   "action": {
