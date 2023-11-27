@@ -3,15 +3,30 @@
   "name": "Hacker News Tools",
   "version": "1.0",
   "description": "Read Hacker News comments with ease.",
-  "permissions": ["scripting", "tabs", "activeTab", "storage"],
+  "permissions": [
+    "scripting",
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://news.ycombinator.com/item*"],
-      "js": ["index.js"]
+      "matches": [
+        "*://news.ycombinator.com/item*"
+      ],
+      "js": [
+        "index.js"
+      ]
     }
   ],
   "action": {
     "default_popup": "popup.html"
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
 }
