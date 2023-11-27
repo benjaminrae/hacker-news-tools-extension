@@ -1,9 +1,9 @@
-import { getWindowDimensions } from '../dimensions';
+import { Viewport } from '../Viewport/Viewport';
 import { ExtensionOptions } from '../types';
 
 export const getOptions = () => {
   return new Promise<ExtensionOptions>(resolve => {
-    const { height, width } = getWindowDimensions();
+    const { height, width } = Viewport.getDimensions();
 
     const options: ExtensionOptions = {
       widgetPositionY: height - 10,
@@ -13,8 +13,6 @@ export const getOptions = () => {
     chrome.storage.sync.get(
       ['widgetPositionY', 'widgetPositionX'],
       savedOptions => {
-        console.log(savedOptions);
-
         options.widgetPositionX = savedOptions.widgetPositionX;
         options.widgetPositionY = savedOptions.widgetPositionY;
 

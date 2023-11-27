@@ -1,4 +1,4 @@
-const css = `
+export const scrollButtonsWidgetStyles = `
 .hn-scroller {
   position: fixed;
   display: flex;
@@ -38,10 +38,18 @@ const css = `
   border: 1px solid black;
 }
 
-`;
+.hn-highlight {
+  background-color: rgba(255, 240, 0, 1);
+  animation: fadeOut 2s ease;
+}
 
-export const loadStyles = () => {
-  const style = document.createElement('style');
-  style.innerHTML = css;
-  document.head.appendChild(style);
-};
+@keyframes fadeOut {
+  from {
+    background-color: rgba(255, 240, 0, 1);
+  }
+  to {
+    background-color: rgba(255, 240, 0, 0);
+  }
+}
+
+`;
