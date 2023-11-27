@@ -1,23 +1,19 @@
-import { Viewport } from './Viewport';
-import { createCommentPositionMaps } from './createCommentPositionMaps';
-import { getWindowDimensions } from './dimensions';
+import { CommentMap } from './CommentMap/CommentMap';
+import { TopLevelComment } from './TopLevelComment/TopLevelComment';
+import { Viewport } from './Viewport/Viewport';
 import { getOptions } from './storage/getOptions';
 import { saveOptions } from './storage/saveOptions';
-import { nextCommentIndexStrategy } from './strategies/nextCommentStrategy';
-import { previousCommentIndexStrategy } from './strategies/previousCommentStrategy';
 import { inPx } from './styles/inPx';
 import { loadStyles } from './styles/loadStyles';
 import { scrollButtonsWidgetStyles } from './styles/scrollButtonsWidgetStyles';
 import { loadScrollButtonsWidget } from './widget/scrollButtonsWidget';
 
 const topLevelCommentQuery = "td.ind[indent='0']";
-const topLevelComments =
-  document.querySelectorAll<HTMLElement>(topLevelCommentQuery);
+const topLevelComments = Array.from(
+  document.querySelectorAll<HTMLElement>(topLevelCommentQuery),
+).map(comment => new TopLevelComment(comment));
 
-const { commentYPositionCeilMap, commentYPositionFloorMap } =
-  createCommentPositionMaps(topLevelComments);
-
-const viewport = new Viewport(window.scrollY);
+const commentMap = CommentMap.from(...topLevelComments);
 
 // document.addEventListener('scroll', () => {
 //   viewport.moveToY(window.screenY);
@@ -28,7 +24,7 @@ loadStyles(scrollButtonsWidgetStyles);
 
 let clickX: number;
 let clickY: number;
-let { height, width } = getWindowDimensions();
+let { height, width } = Viewport.getDimensions();
 
 const offsetHorizontal = 100;
 const offsetVertical = 100;
@@ -37,14 +33,16 @@ container.style.top = inPx(height - offsetVertical);
 container.style.left = inPx(width - offsetHorizontal);
 
 getOptions().then(options => {
-  console.log(options);
-
   container.style.top = inPx(
     options.widgetPositionY ?? height - offsetVertical,
   );
   container.style.left = inPx(
     options.widgetPositionX ?? width - offsetHorizontal,
   );
+
+  if (!Viewport.isInsideViewport(container)) {
+    Viewport.moveInsideViewport(container, offsetHorizontal, offsetVertical);
+  }
 });
 
 container.addEventListener('mousedown', event => {
@@ -59,7 +57,6 @@ container.addEventListener('mousedown', event => {
 });
 
 container.addEventListener('dragstart', event => {
-  console.log('drag start');
   if (!event.dataTransfer) {
     return;
   }
@@ -73,8 +70,6 @@ document.addEventListener('dragover', event => {
 });
 
 container.addEventListener('dragend', event => {
-  console.log('drag end');
-
   if (!event.dataTransfer) {
     return;
   }
@@ -96,77 +91,41 @@ container.addEventListener('dragend', event => {
   });
 });
 
-previousButton.addEventListener('click', () => {
-  const commentToScrollTo = previousCommentIndexStrategy(
-    viewport.yPosition,
-    commentYPositionCeilMap,
-  );
+previousButton.addEventListener('click', (event: MouseEvent) => {
+  event.stopPropagation();
 
-  if (!commentToScrollTo) {
+  const yPosition = window.scrollY;
+
+  const previous = commentMap.prev(yPosition);
+
+  if (!previous) {
     return;
   }
 
-  commentToScrollTo.scrollTo();
+  previous.scrollTo();
 });
 
-nextButton.addEventListener('click', () => {
-  console.log('window', window.scrollY);
-  console.log('viewport', viewport.yPosition);
+nextButton.addEventListener('click', (event: MouseEvent) => {
+  event.stopPropagation();
 
-  const commentToScrollTo = nextCommentIndexStrategy(
-    viewport.yPosition,
-    commentYPositionFloorMap,
-  );
+  const yPosition = window.scrollY;
+  const next = commentMap.next(yPosition);
 
-  if (!commentToScrollTo) {
+  if (!next) {
     return;
   }
 
-  commentToScrollTo.scrollTo();
-  viewport.moveToY(commentToScrollTo.getDomElement().getBoundingClientRect().y);
-
-  console.log(
-    'gbcr',
-    commentToScrollTo.getDomElement().getBoundingClientRect().y,
-  );
-  console.log(viewport.yPosition);
+  next.scrollTo();
 });
 
 window.addEventListener('resize', event => {
-  const newWidth = window.innerWidth;
-  const newHeight = window.innerHeight;
-
-  const widthDifference = width - newWidth;
-  const heightDifference = height - newHeight;
-
-  width = newWidth;
-  height = newHeight;
-
-  // Adjust the container's position, keeping it within the bounds with a margin of 100px
-  const containerRect = container.getBoundingClientRect();
-
-  if (Math.abs(containerRect.x - width) < offsetHorizontal) {
-    let newLeft = containerRect.left - widthDifference;
-
-    newLeft = Math.max(
-      Math.min(newLeft, newWidth - 100 - containerRect.width),
-      -100,
-    );
-
-    container.style.left = inPx(newLeft);
+  if (Viewport.isInsideViewport(container)) {
+    return;
   }
 
-  if (Math.abs(containerRect.y - height) < offsetVertical) {
-    let newTop = containerRect.top - heightDifference;
-    newTop = Math.max(
-      Math.min(newTop, newHeight - 100 - containerRect.height),
-      -100,
-    );
+  Viewport.moveInsideViewport(container, offsetHorizontal, offsetVertical);
 
-    container.style.top = inPx(newTop);
-  }
+  const { top, left } = container.getBoundingClientRect();
 
-  // Ensure the new position is within the bounds with a margin of 100px
-
-  //  saveOptions({widgetPositionY: newTop, widgetPositionX: newLeft})
+  saveOptions({ widgetPositionY: top, widgetPositionX: left });
 });

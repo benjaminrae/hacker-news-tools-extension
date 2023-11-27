@@ -38,4 +38,18 @@ export const scrollButtonsWidgetStyles = `
   border: 1px solid black;
 }
 
+.hn-highlight {
+  background-color: rgba(255, 240, 0, 1);
+  animation: fadeOut 2s ease;
+}
+
+@keyframes fadeOut {
+  from {
+    background-color: rgba(255, 240, 0, 1);
+  }
+  to {
+    background-color: rgba(255, 240, 0, 0);
+  }
+}
+
 `;

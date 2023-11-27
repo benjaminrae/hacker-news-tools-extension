@@ -13,6 +13,7 @@ export type ExtensionOptions = {
 };
 
 export interface Comment {
+  getY(): number;
   scrollTo(): void;
   getDomElement(): HTMLElement;
 }

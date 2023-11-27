@@ -6,6 +6,9 @@ export class TopLevelComment implements Comment {
   constructor(domElement: HTMLElement) {
     this.#domElement = domElement;
   }
+  getY(): number {
+    return this.#domElement.getBoundingClientRect().y;
+  }
 
   getDomElement(): HTMLElement {
     return this.#domElement;
